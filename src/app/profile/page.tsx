@@ -6,6 +6,7 @@ import { Alert } from '@/components/ui/alert';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/ui/loader';
 
 interface Profile {
     id: number;
@@ -30,6 +31,10 @@ export default function Home() {
             return;
         }
 
+        if (!hasMore && !reset) {
+            return;
+        }
+
         setLoading(true);
         setError(null);
         try {
@@ -44,7 +49,7 @@ export default function Home() {
 
             if (newProfiles.length === 0) setHasMore(false);
         } catch (error: any) {
-            setError(error.message || 'Error fetching profiles. Please try again.');
+            setHasMore(false);
         } finally {
             setLoading(false);
         }
@@ -79,13 +84,14 @@ export default function Home() {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-bold mb-4">PeerHub Finder</h1>
-            <div className="mb-4">
+            <div className="mb-4 flex items-center">
                 <Input
                     value={location}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setLocation(e.target.value)}
                     placeholder="Enter location"
+                    className="flex-grow"
                 />
-                <Button onClick={() => { setPage(1); setHasMore(true); getProfiles(true); }} className="ml-2">Search</Button>
+                <Button onClick={() => { setPage(1); setHasMore(true); getProfiles(true);setHasMore(true); }} className="ml-2">Search</Button>
             </div>
 
             {error && <Alert variant="destructive">{error}</Alert>}
@@ -109,9 +115,9 @@ export default function Home() {
                 ))}
             </div>
 
-            <div ref={loader}>
-                {loading && <p>Loading more profiles...</p>}
-                {!hasMore && <p>No more profiles</p>}
+            <div ref={loader} className="flex justify-center items-center mt-4">
+                {loading && <LoadingSpinner size={48} className="text-blue-500" />}
+                {!loading && !hasMore && <p>No more profiles</p>}
             </div>
         </div>
     );
