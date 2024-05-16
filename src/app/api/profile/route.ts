@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     const now = Date.now();
 
     if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_EXPIRY) {
-        console.log("cached data bay")
+        console.log("Using cached data");
         return NextResponse.json(cache[cacheKey].data, { status: 200 });
     }
 
@@ -45,11 +45,10 @@ export async function GET(request: NextRequest) {
             avatar_url: profile.avatar_url,
         }));
 
-        // Store the response in the cache with a timestamp
         cache[cacheKey] = { data: profiles, timestamp: now };
 
         return NextResponse.json(profiles, { status: 200 });
-    } catch (error:any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message || 'Failed to fetch profiles' }, { status: 500 });
     }
 }

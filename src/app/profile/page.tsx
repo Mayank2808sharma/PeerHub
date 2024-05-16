@@ -43,8 +43,8 @@ export default function Home() {
             });
 
             if (newProfiles.length === 0) setHasMore(false);
-        } catch (error) {
-            setError('Error fetching profiles. Please try again.');
+        } catch (error: any) {
+            setError(error.message || 'Error fetching profiles. Please try again.');
         } finally {
             setLoading(false);
         }
