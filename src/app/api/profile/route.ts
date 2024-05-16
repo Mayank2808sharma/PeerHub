@@ -9,14 +9,6 @@ interface Profile {
     avatar_url: string;
 }
 
-interface CacheEntry {
-    data: Profile[];
-    timestamp: number;
-}
-
-const cache: Record<string, CacheEntry> = {};
-const CACHE_EXPIRY = 60 * 60 * 1000; // 1 hour in milliseconds
-
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const location = searchParams.get('location');
@@ -25,14 +17,6 @@ export async function GET(request: NextRequest) {
 
     if (!location) {
         return NextResponse.json({ error: 'Location is required' }, { status: 400 });
-    }
-
-    const cacheKey = `${location}-${page}-${perPage}`;
-    const now = Date.now();
-
-    if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_EXPIRY) {
-        console.log("Using cached data");
-        return NextResponse.json(cache[cacheKey].data, { status: 200 });
     }
 
     try {
@@ -45,7 +29,6 @@ export async function GET(request: NextRequest) {
             avatar_url: profile.avatar_url,
         }));
 
-        cache[cacheKey] = { data: profiles, timestamp: now };
 
         return NextResponse.json(profiles, { status: 200 });
     } catch (error: any) {
